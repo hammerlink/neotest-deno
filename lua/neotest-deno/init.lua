@@ -1,4 +1,4 @@
-local deno_adapter_config = require("deno-adapter-config")
+local deno_adapter_config = require("neotest-deno.deno-adapter-config")
 local lib = require("neotest.lib")
 local logger = require("neotest.logging")
 

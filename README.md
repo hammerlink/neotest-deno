@@ -11,7 +11,7 @@ A [Deno](https://deno.land/) adapter for [neotest](https://github.com/nvim-neote
 
 ## Requirements
 
-- Neovim >= 0.7.0
+- Neovim >= 0.10.0
 - [neotest](https://github.com/nvim-neotest/neotest)
 - [Deno](https://deno.land/) v2.0.0 or higher
 - [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) with JavaScript/TypeScript parsers installed
@@ -69,18 +69,9 @@ require("neotest").setup({
 })
 ```
 
-## Usage
-
-neotest-deno works with standard neotest commands:
-
-- `:lua require("neotest").run.run()` - Run the nearest test
-- `:lua require("neotest").run.run(vim.fn.expand("%"))` - Run current file
-- `:lua require("neotest").run.run(vim.loop.cwd())` - Run all tests in project
-- `:lua require("neotest").summary.toggle()` - Toggle summary window
-
-## Supported Test Frameworks
-
-This adapter supports Deno's built-in test runner with the 'pretty' reporter format.
+## TODO
+- [ ] running directories not supported
+- [ ] treesitter supporting nested subtests
 
 ## License
 
@@ -89,7 +80,5 @@ MIT
 ## Credits
 
 This adapter is based on the neotest framework and inspired by other neotest adapters.
-```
 
 This README now provides comprehensive information about your neotest-deno adapter, including installation instructions, configuration options, usage examples, and other standard sections expected in a Neovim plugin README. Feel free to adjust any details that don't match your specific implementation!
-```

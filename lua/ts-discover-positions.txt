@@ -1,0 +1,56 @@
+; Basic Deno.test with a named function
+(call_expression
+  function: (member_expression
+    object: (identifier) @object (#eq? @object "Deno")
+    property: (property_identifier) @property (#eq? @property "test")
+  )
+  arguments: (arguments
+    (function_expression
+      name: (identifier) @test.name
+    ) @test.function
+  )
+) @test.definition
+
+; Deno.test with a string name and function expression
+(call_expression
+  function: (member_expression
+    object: (identifier) @object (#eq? @object "Deno")
+    property: (property_identifier) @property (#eq? @property "test")
+  )
+  arguments: (arguments
+    (string (string_fragment) @test.name)
+    (function_expression) @test.function
+  )
+) @test.definition
+
+; Deno.test with just an anonymous function or arrow function
+(call_expression
+  function: (member_expression
+    object: (identifier) @object (#eq? @object "Deno")
+    property: (property_identifier) @property (#eq? @property "test")
+  )
+  arguments: (arguments
+    (string (string_fragment) @test.name)
+    (arrow_function) @test.function
+  )
+) @test.definition
+
+; Deno.test with options object
+(call_expression
+  function: (member_expression
+    object: (identifier) @object (#eq? @object "Deno")
+    property: (property_identifier) @property (#eq? @property "test")
+  )
+  arguments: (arguments
+    (object
+      (pair
+        key: (property_identifier) @key1 (#eq? @key1 "name")
+        value: (string (string_fragment) @test.name)
+      )
+      (pair
+        key: (property_identifier) @key2 (#eq? @key2 "fn")
+        value: (arrow_function) @test.function
+      )
+      )
+    )
+  ) @test.definition

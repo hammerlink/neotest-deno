@@ -21,6 +21,7 @@ return function(build_specfication, result, tree)
 	local position = tree:data()
 	local is_test = position.type == "test"
 	local is_file = position.type == "file"
+    -- is directory
 
     print("deno path " .. deno_adapter_config.deno_cmd)
 	-- Get the directory of the current file
@@ -30,7 +31,7 @@ return function(build_specfication, result, tree)
 		deno_adapter_config.deno_cmd
 			.. " run --allow-read "
 			.. current_dir
-			.. "../src/parse-deno-test-output.ts "
+			.. "../../src/parse-deno-test-output.ts "
 			.. result.output
 	)
 

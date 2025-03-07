@@ -41,69 +41,26 @@ function NeotestAdapter.is_test_file(file_path)
 	return false
 end
 
+-- Cache for the query string
+local query = nil
 ---Parse the AST of a test file to get the test positions
 ---@async
 ---@param file_path string Absolute file path
 ---@return neotest.Tree|nil
 function NeotestAdapter.discover_positions(file_path)
-	local query = [[
-    ; Basic Deno.test with a named function
-    (call_expression
-      function: (member_expression
-        object: (identifier) @object (#eq? @object "Deno")
-        property: (property_identifier) @property (#eq? @property "test")
-      )
-      arguments: (arguments
-        (function_expression
-          name: (identifier) @test.name
-        ) @test.function
-      )
-    ) @test.definition
+	-- Lazy load the query file only when needed
+	if not query then
+		local query_path = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h") .. "/../ts-discover-positions.txt"
+		local query_file = io.open(query_path, "r")
+		if not query_file then
+			logger.error("Could not open query file: " .. query_path)
+			return nil
+		end
 
-    ; Deno.test with a string name and function expression
-    (call_expression
-      function: (member_expression
-        object: (identifier) @object (#eq? @object "Deno")
-        property: (property_identifier) @property (#eq? @property "test")
-      )
-      arguments: (arguments
-        (string (string_fragment) @test.name)
-        (function_expression) @test.function
-      )
-    ) @test.definition
-
-    ; Deno.test with just an anonymous function or arrow function
-    (call_expression
-      function: (member_expression
-        object: (identifier) @object (#eq? @object "Deno")
-        property: (property_identifier) @property (#eq? @property "test")
-      )
-      arguments: (arguments
-        (string (string_fragment) @test.name)
-        (arrow_function) @test.function
-      )
-    ) @test.definition
-
-    ; Deno.test with options object
-    (call_expression
-      function: (member_expression
-        object: (identifier) @object (#eq? @object "Deno")
-        property: (property_identifier) @property (#eq? @property "test")
-      )
-      arguments: (arguments
-        (object
-          (pair
-            key: (property_identifier) @key1 (#eq? @key1 "name")
-            value: (string (string_fragment) @test.name)
-          )
-          (pair
-            key: (property_identifier) @key2 (#eq? @key2 "fn")
-            value: (arrow_function) @test.function
-          )
-          )
-        )
-      ) @test.definition
-  ]]
+		query = query_file:read("*all")
+		query_file:close()
+	end
+	-- Get the path to the query file relative to this module
 
 	return lib.treesitter.parse_positions(file_path, query, { nested_tests = true })
 end

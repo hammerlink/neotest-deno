@@ -11,6 +11,14 @@ const QUERY_DIR = join(dirname(fromFileUrl(import.meta.url)), '../lua/ts-discove
 const QUERY = await Deno.readTextFile(QUERY_DIR);
 const query = new Parser.Query(TsTypeScript.typescript as Language, QUERY);
 
+/**
+ * Validates a Tree-sitter query against a test file.
+ * 
+ * This helper function loads a test file, parses it using Tree-sitter,
+ * and validates that the query matches as expected. It ensures:
+ * 1. The query matches exactly once in the test file
+ * 2. If a test name is provided, it verifies the 'test.name' capture matches that name
+ */
 async function validateTestQuery(testRelativePath: string, testOptions?: { name?: string }) {
     const TEST_DIR = join(dirname(fromFileUrl(import.meta.url)), testRelativePath);
     const TEST = await Deno.readTextFile(TEST_DIR);

@@ -4,7 +4,7 @@ local logger = require("neotest.logging")
 
 ---@class neotest.Adapter
 ---@field name string
-local NeotestAdapter = { name = "neotest-deno", results = require("deno-test.collect-results") }
+local NeotestAdapter = { name = "neotest-deno", results = require("neotest-deno.collect-results") }
 
 ---Find the project root directory
 function NeotestAdapter.root(path)

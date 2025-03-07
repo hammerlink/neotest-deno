@@ -13,28 +13,39 @@ const query = new Parser.Query(TsTypeScript.typescript as Language, QUERY);
 
 /**
  * Validates a Tree-sitter query against a test file.
- * 
+ *
  * This helper function loads a test file, parses it using Tree-sitter,
  * and validates that the query matches as expected. It ensures:
- * 1. The query matches exactly once in the test file
- * 2. If a test name is provided, it verifies the 'test.name' capture matches that name
+ * 1. The query matches the expected number of times in the test file
+ *    (defaults to 1 if no names are provided)
+ * 2. If test names are provided in the options, it verifies that each 'test.name'
+ *    capture matches one of the expected names
  */
-async function validateTestQuery(testRelativePath: string, testOptions?: { name?: string }) {
+async function validateTestQuery(testRelativePath: string, testOptions?: { names?: string[] }) {
     const TEST_DIR = join(dirname(fromFileUrl(import.meta.url)), testRelativePath);
     const TEST = await Deno.readTextFile(TEST_DIR);
     const tree = parser.parse(TEST);
     assert(tree !== null, 'Tree is null');
 
     const matches = query.matches(tree.rootNode);
-    assertEquals(matches.length, 1);
-    if (testOptions?.name) {
-        assertEquals(matches[0].captures.find((x) => x.name === 'test.name')?.node.text, testOptions.name);
+    const expectedMatches = testOptions?.names?.length ?? 1;
+    assertEquals(matches.length, expectedMatches);
+
+    if (testOptions?.names) {
+        testOptions.names.forEach((name) => {
+            const match = matches.find((x) => x.captures.find((y) => y.name === 'test.name')?.node.text === name);
+            assert(match !== null, `Could not find match with name ${name}`);
+        });
     }
 }
 
 Deno.test('Tree-sitter - Function name', async () => {
-    await validateTestQuery('./tree-sitter-examples/deno-function.test.ts', { name: 'DenoFunction' });
+    await validateTestQuery('./tree-sitter-examples/deno-function.test.ts', {
+        names: ['DenoFunction', 'DenoAsyncFunction'],
+    });
 });
-Deno.test('Tree-sitter - Async Function name', async () => {
-    await validateTestQuery('./tree-sitter-examples/deno-async-function.test.ts', { name: 'DenoAsyncFunction' });
+Deno.test('Tree-sitter - Arg Name Function', async () => {
+    await validateTestQuery('./tree-sitter-examples/deno-arg-function.test.ts', {
+        names: ['DenoArgFunction', 'DenoArgAsyncFunction', 'DenoArgArrowFunction', 'DenoArgArrowAsyncFunction'],
+    });
 });

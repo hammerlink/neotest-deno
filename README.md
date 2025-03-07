@@ -74,6 +74,7 @@ require("neotest").setup({
 - [ ] treesitter supporting nested subtests
 - [ ] support dap
 - [ ] treesitter - support `Deno.test.ignore|only()` tests
+- [ ] running single files sometimes fails (example in tree-sitter.test.ts)
 
 ## License
 

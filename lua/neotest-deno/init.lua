@@ -50,7 +50,8 @@ local query = nil
 function NeotestAdapter.discover_positions(file_path)
 	-- Lazy load the query file only when needed
 	if not query then
-		local query_path = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h") .. "/../ts-discover-positions.txt"
+		local query_path = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h")
+			.. "/../ts-discover-positions.txt"
 		local query_file = io.open(query_path, "r")
 		if not query_file then
 			logger.error("Could not open query file: " .. query_path)
@@ -85,8 +86,6 @@ function NeotestAdapter.build_spec(args)
 	-- If we're running a specific test, add the filter
 	if position.type == "test" then
 		local test_name = position.name
-		-- Escape special characters in the test name for the filter
-		test_name = test_name:gsub("([%(%)%.%[%]%*%+%-%?%$%^])", "\\%1")
 		table.insert(command, "--filter")
 		table.insert(command, test_name)
 	end

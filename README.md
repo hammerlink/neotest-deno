@@ -35,6 +35,7 @@ use({
     })
   end,
 })
+```
 
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 

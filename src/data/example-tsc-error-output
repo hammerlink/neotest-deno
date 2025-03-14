@@ -1,0 +1,10 @@
+Check file:///home/hendrik/Projects/neotest-deno/src/engine/tsc-error.test.ts
+TS2304 [ERROR]: Cannot find name 'parseTestOutput'.
+    const result = parseTestOutput();
+                   ~~~~~~~~~~~~~~~
+    at file:///home/hendrik/Projects/neotest-deno/src/engine/tsc-error.test.ts:2:20
+
+error: Type checking failed.
+
+  info: The program failed type-checking, but it still might work correctly.
+  hint: Re-run with --no-check to skip type-checking.

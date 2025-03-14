@@ -25,7 +25,7 @@ export type TestOutput = {
 
 // keep running this, if no encounters -> no results
 export function parsePathLine(line: string): TestPathLine | null {
-    const match = line.match(/^running (\d+) tests? from (.+\.ts)$/);
+    const match = line.match(/^running (\d+) tests? from (.+)$/);
     if (!match) return null;
     const [_line, testCount, testPath] = match;
     return { testPath, count: parseInt(testCount, 10) };

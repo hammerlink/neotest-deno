@@ -1,5 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
-import { parsePathLine, parseTestNameLine, parseTestOutput } from './test-output.engine.ts';
+import { parseFailureLine, parsePathLine, parseTestNameLine, parseTestOutput } from './test-output.engine.ts';
 import { dirname, fromFileUrl, join } from 'jsr:@std/path';
 
 Deno.test('parsePathLine', () => {
@@ -65,6 +65,11 @@ Deno.test('parseTestNameLine', () => {
     })();
 });
 
+Deno.test('parseFailureLine', () => {
+    const result = parseFailureLine('secondTest => ./sub/second_test.ts:4:6');
+    assert(result !== null);
+});
+
 Deno.test('parseTestOutput', () => {
     const FILE_DIR = dirname(fromFileUrl(import.meta.url));
     const text = Deno.readTextFileSync(join(FILE_DIR, '../data/example-dir-output'));
@@ -87,12 +92,16 @@ Deno.test('parseTestOutput', () => {
     const second_test = result.testFiles['./sub/second_test.ts'];
     const second_testTests = Object.keys(second_test.tests);
     assertEquals(second_testTests.length, 4);
-    
+
     assertEquals(second_testTests[0], 'secondTest');
     let currentTest = second_test.tests['secondTest'];
     assertEquals(currentTest.type, 'FAILED');
     assertEquals(currentTest.durationMs, 504);
     assertEquals(currentTest.logs, ['custom log', 'custom log 1'].join('\n'));
+    assert(currentTest.failureLine !== undefined);
+    assertEquals(currentTest.failureLine.testName, 'secondTest');
+    assertEquals(currentTest.failureLine.line, 4);
+    assertEquals(currentTest.failureLine.char, 6);
 
     assertEquals(second_testTests[1], 'secondXTest');
     currentTest = second_test.tests['secondXTest'];

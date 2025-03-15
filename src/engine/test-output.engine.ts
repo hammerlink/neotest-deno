@@ -8,6 +8,7 @@ const denoResultTypes = Object.values(DenoResultType);
 type TestPathLine = { testPath: string; count: number };
 type TestNameLine = TestNameLineBegin | TestNameLineEnd;
 type FailureLine = { testName: string; filePath: string; line: number; char: number };
+type ErrorLine = FailureLine & { message: string; errorLog: string };
 type TestNameLineBegin = { testName: string; isBegin: true };
 type TestNameLineEnd = {
     testName: string;
@@ -15,6 +16,7 @@ type TestNameLineEnd = {
     type: DenoResultType;
     durationMs: number;
     failureLine?: FailureLine;
+    errorLine?: ErrorLine;
 };
 
 export type TestOutput = {
@@ -24,7 +26,6 @@ export type TestOutput = {
             tests: {
                 [testName: string]: TestNameLineEnd & {
                     logs?: string;
-                    errors?: string; // todo might need error lines & logs
                 };
             };
         };
@@ -88,12 +89,12 @@ const readTestFileResult = (
         let logs: string | undefined = undefined;
         const testResult: TestNameLineEnd = testNameLine.isBegin
             ? (() => {
-                if (!lines[++lineIndex].includes('------- post-test output -------')) {
-                    throw new Error('Expected post-test output');
+                if (!lines[++lineIndex].match(/------- (post-test )?output -------/)) {
+                    throw new Error(`Expected post-test output ${lines.join('\n')}`);
                 }
                 while (lineIndex < lines.length) {
                     const logLine = lines[++lineIndex];
-                    if (logLine.includes('----- post-test output end -----')) break;
+                    if (logLine.match(/----- (post-test )?output end -----/)) break;
                     logs = logs !== undefined ? logs + '\n' + logLine : logLine;
                 }
                 const endLine = lines[++lineIndex];
@@ -130,6 +131,71 @@ const readTestFilesBlock = (
 const readErrorsBlock = (lines: string[], lineIndex: number, testOutput: TestOutput): { lineIndex: number } => {
     lineIndex += 2; // skip empty line
 
+    let encounteredFailuresBlock = false;
+    while (lineIndex < lines.length) {
+        const failureLine = parseFailureLine(lines[lineIndex]);
+        if (!failureLine) {
+            // If we've reached a FAILURES marker or end of errors section, break
+            if (isFailuresMarker(lines[lineIndex], lines, lineIndex)) {
+                encounteredFailuresBlock = true;
+                break;
+            }
+            lineIndex++;
+            continue;
+        }
+
+        const { testName, filePath } = failureLine;
+
+        // Move to the next line which should be the error message
+        lineIndex++;
+        const errorLine = lines[lineIndex];
+        const message = errorLine.match(/error: (.+)/)?.[1] || 'Unknown error';
+
+        // Collect the error message and stack trace
+        const errorLines: string[] = [];
+
+        // Continue collecting lines until we find the next failure or end of errors section
+        while (lineIndex < lines.length) {
+            const nextLine = lines[lineIndex];
+
+            // Check if we've reached the next failure or end of errors section
+            if (
+                parseFailureLine(nextLine) ||
+                isFailuresMarker(nextLine, lines, lineIndex)
+            ) {
+                encounteredFailuresBlock = isFailuresMarker(nextLine, lines, lineIndex);
+                break;
+            }
+
+            errorLines.push(nextLine);
+            lineIndex++;
+        }
+        // Find the line and char number of the error
+        (() => {
+            const rawPath = filePath.replace(/^\.\/?/, '');
+            const lastMatch = errorLines.findLast((line) => line.includes(rawPath));
+            if (!lastMatch) return;
+            const match = lastMatch.match(/:([0-9]+):([0-9]+)\)?$/);
+            if (!match) return;
+            const [_line, lineNumber, charNumber] = match;
+            failureLine.line = parseInt(lineNumber, 10);
+            failureLine.char = parseInt(charNumber, 10);
+        })();
+
+        testOutput.testFiles[filePath].tests[testName].errorLine = {
+            ...failureLine,
+            message,
+            errorLog: errorLines.join('\n'),
+        };
+    }
+
+    if (encounteredFailuresBlock) lineIndex -= 1;
+
+    return { lineIndex };
+};
+const readFailuresBlock = (lines: string[], lineIndex: number, testOutput: TestOutput): { lineIndex: number } => {
+    lineIndex += 2; // skip empty line
+
     do {
         const failureLine = parseFailureLine(lines[lineIndex]);
         if (!failureLine) break;
@@ -138,14 +204,6 @@ const readErrorsBlock = (lines: string[], lineIndex: number, testOutput: TestOut
 
         lineIndex++;
     } while (lineIndex < lines.length);
-    // TODO
-
-    return { lineIndex };
-};
-const readFailuresBlock = (lines: string[], lineIndex: number, testOutput: TestOutput): { lineIndex: number } => {
-    lineIndex += 2; // skip empty line
-
-    // TODO
 
     return { lineIndex };
 };

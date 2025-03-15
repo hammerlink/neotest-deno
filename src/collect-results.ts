@@ -3,6 +3,12 @@ import { parseTestOutput } from './engine/test-output.engine.ts';
 import { BuildSpecificationResult, TestErrorLine, TestStatus } from './models/build-specification-result.model.ts';
 import { BuildSpecification } from './models/build-specification.model.ts';
 import { ansiRegex } from './engine/text.engine.ts';
+import { dirname, fromFileUrl } from 'jsr:@std/path';
+
+const FILE_DIR = dirname(fromFileUrl(import.meta.url));
+const OUTPUT_DIR = join(FILE_DIR, './data/output/');
+// TOGGLE TO INSPECT DENO TEST OUTPUT
+const TOGGLE_TEST_OUTPUT_CAPTURE = false;
 
 try {
     const args = Deno.args;
@@ -13,6 +19,16 @@ try {
 
     let testOutputText = await Deno.readTextFile(args[0]);
     testOutputText = testOutputText.replace(ansiRegex(), '').replace(/\r\n/g, '\n');
+
+    // write output
+
+    if (TOGGLE_TEST_OUTPUT_CAPTURE) {
+        Deno.mkdirSync(OUTPUT_DIR, { recursive: true });
+        Deno.writeTextFileSync(
+            join(OUTPUT_DIR, `deno-test-log-${new Date().toISOString().replace(/\s/g, '')}`),
+            testOutputText,
+        );
+    }
 
     const input: BuildSpecification = JSON.parse(args[1]);
     const positionId = input.context.position_id;
@@ -44,11 +60,11 @@ try {
                     if (test.type === 'ignored') return 'skipped';
                     return 'failed';
                 })(),
-                errors: test.failureLine
+                errors: test.errorLine
                     ? [
                         {
-                            message: 'Test Failed TODO extract error',
-                            line: test.failureLine.line,
+                            message: test.errorLine.message,
+                            line: test.errorLine.line - (test.errorLine.line > 0 ? 1 : 0),
                         } satisfies TestErrorLine,
                     ]
                     : [],

@@ -121,3 +121,29 @@ Deno.test('parseTestOutput', () => {
     assertEquals(currentTest.durationMs, 0);
     assertEquals(currentTest.logs, undefined);
 });
+
+Deno.test('parseTestOutput - multi failures', () => {
+    const FILE_DIR = dirname(fromFileUrl(import.meta.url));
+    const text = Deno.readTextFileSync(join(FILE_DIR, '../data/example-multi-failures'));
+    const result = parseTestOutput(text);
+
+    const testFiles = Object.values(result.testFiles);
+    assertEquals(testFiles.length, 1);
+
+    const tests = Object.values(testFiles[0].tests);
+
+    console.log(JSON.stringify(tests, null, 2));
+    assert(tests[0].failureLine !== undefined);
+    if (tests[0].failureLine === undefined) throw new Error('Expected failure line');
+    assertEquals(tests[0].failureLine.line, 3);
+
+    if (tests[0].errorLine === undefined) throw new Error('Expected error lines');
+    assertEquals(tests[0].errorLine.line, 4);
+
+    assert(tests[1].failureLine !== undefined);
+    if (tests[1].failureLine === undefined) throw new Error('Expected failure line');
+    assertEquals(tests[1].failureLine.line, 7);
+
+    if (tests[1].errorLine === undefined) throw new Error('Expected error lines');
+    assertEquals(tests[1].errorLine.line, 8);
+});

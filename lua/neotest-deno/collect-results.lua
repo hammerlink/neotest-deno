@@ -18,7 +18,7 @@ return function(build_specfication, result, tree)
 			.. "'"
 	)
 	local output = vim.fn.json_decode(output_raw)
-	vim.inspect(output)
+	-- vim.inspect(output)
 	return output
 
 	-- local encoded_spec = vim.fn.json_encode(build_specfication)

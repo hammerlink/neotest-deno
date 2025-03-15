@@ -8,6 +8,11 @@ export interface BuildSpecification {
     command: string[];
 
     /**
+     * Current working directory
+     */
+    cwd: string;
+
+    /**
      * Context information for the test
      */
     context: {

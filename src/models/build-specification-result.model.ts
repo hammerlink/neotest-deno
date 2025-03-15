@@ -1,10 +1,18 @@
 export type TestStatus = 'skipped' | 'passed' | 'failed' | 'filtered';
+
 /**
  * Represents the result of a specific test
  */
 export interface TestResult {
-    errors: Record<string, any>;
+    errors: TestErrorLine[];
+    /** Path to file containing full output data */
+    output?: string;
     status: TestStatus;
+}
+
+export interface TestErrorLine {
+    message: string;
+    line?: number;
 }
 
 /**

@@ -18,6 +18,7 @@ type TestNameLineEnd = {
 };
 
 export type TestOutput = {
+    /** testPaths are relative to the working directory */
     testFiles: {
         [testPath: string]: TestPathLine & {
             tests: {

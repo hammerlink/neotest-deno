@@ -97,6 +97,7 @@ function NeotestAdapter.build_spec(args)
 
 	return {
 		command = command,
+		cwd = vim.fn.getcwd(),
 		context = {
 			file = file_path,
 			position_id = position.id,

@@ -1,0 +1,4 @@
+running 1 test from ./sub/second.test.ts
+addTest ... ok (0ms)
+
+ok | 1 passed | 0 failed (6ms)

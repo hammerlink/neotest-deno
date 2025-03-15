@@ -1,0 +1,42 @@
+running 1 test from ./sub/second.test.ts
+addTest ... ok (0ms)
+running 4 tests from ./sub/second_test.ts
+secondTest ...
+------- post-test output -------
+custom log
+custom log 1
+----- post-test output end -----
+secondTest ... FAILED (504ms)
+secondXTest ...
+------- post-test output -------
+x x x
+----- post-test output end -----
+secondXTest ... ok (0ms)
+second - YTest ... ignored (0ms)
+secondZTest ... ignored (0ms)
+
+ ERRORS 
+
+secondTest => ./sub/second_test.ts:4:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   6
++   5
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.11/equals.ts:64:9)
+    at secondTest (file:///home/hendrik/Projects/deno-dap/sub/second_test.ts:8:5)
+
+ FAILURES 
+
+secondTest => ./sub/second_test.ts:4:6
+
+FAILED | 2 passed | 1 failed | 2 ignored (580ms)
+
+error: Test failed
+

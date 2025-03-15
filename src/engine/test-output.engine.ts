@@ -132,7 +132,6 @@ const readErrorsBlock = (lines: string[], lineIndex: number, testOutput: TestOut
 
     do {
         const failureLine = parseFailureLine(lines[lineIndex]);
-        console.log(failureLine, lines[lineIndex]);
         if (!failureLine) break;
         const { testName, filePath } = failureLine;
         testOutput.testFiles[filePath].tests[testName].failureLine = failureLine;

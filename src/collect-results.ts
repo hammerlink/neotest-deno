@@ -2,7 +2,7 @@ import { join } from 'jsr:@std/path/join';
 import { parseTestOutput } from './engine/test-output.engine.ts';
 import { BuildSpecificationResult, TestErrorLine, TestStatus } from './models/build-specification-result.model.ts';
 import { BuildSpecification } from './models/build-specification.model.ts';
-import { ansiRegex } from './parse-deno-test-output.ts';
+import { ansiRegex } from './engine/text.engine.ts';
 
 try {
     const args = Deno.args;
@@ -56,7 +56,7 @@ try {
         }
     }
 
-    console.log(JSON.stringify(output));
+    console.log(JSON.stringify(output, null, 2));
 } catch (error) {
     console.error(error);
     Deno.exit(1);

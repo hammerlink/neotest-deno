@@ -7,7 +7,7 @@ import TsTypeScript from 'npm:tree-sitter-typescript';
 const parser = new Parser();
 parser.setLanguage(TsTypeScript.typescript as Language);
 
-const QUERY_DIR = join(dirname(fromFileUrl(import.meta.url)), '../lua/ts-discover-positions.txt');
+const QUERY_DIR = join(dirname(fromFileUrl(import.meta.url)), '../lua/ts-discover-positions.scm');
 const QUERY = await Deno.readTextFile(QUERY_DIR);
 const query = new Parser.Query(TsTypeScript.typescript as Language, QUERY);
 
@@ -29,7 +29,11 @@ async function validateTestQuery(testRelativePath: string, testOptions?: { names
 
     const matches = query.matches(tree.rootNode);
     const expectedMatches = testOptions?.names?.length ?? 1;
-    assertEquals(matches.length, expectedMatches);
+    assertEquals(
+        matches.length,
+        expectedMatches,
+        JSON.stringify(matches.map((x) => x.captures.find((y) => y.name === 'test.name')?.node.text)),
+    );
 
     if (testOptions?.names) {
         testOptions.names.forEach((name) => {
@@ -41,11 +45,23 @@ async function validateTestQuery(testRelativePath: string, testOptions?: { names
 
 Deno.test('Tree-sitter - Function name', async () => {
     await validateTestQuery('./tree-sitter-examples/deno-function.test.ts', {
-        names: ['DenoFunction', 'DenoAsyncFunction'],
+        names: ['DenoFunction', 'DenoAsyncFunction', 'DenoIgnoredFunction'],
     });
 });
 Deno.test('Tree-sitter - Arg Name Function', async () => {
     await validateTestQuery('./tree-sitter-examples/deno-arg-function.test.ts', {
         names: ['DenoArgFunction', 'DenoArgAsyncFunction', 'DenoArgArrowFunction', 'DenoArgArrowAsyncFunction'],
+    });
+});
+Deno.test('Tree-sitter - Object name', async () => {
+    await validateTestQuery('./tree-sitter-examples/deno-object.test.ts', {
+        names: [
+            'DenoIgnoreObjectRegularFn',
+            'DenoObjectRegularFn',
+            'DenoObjectNameFn',
+            'DenoObjectArrowFn',
+            'DenoObjectDirectFn',
+            'DenoObjectAsyncDirectFn',
+        ],
     });
 });

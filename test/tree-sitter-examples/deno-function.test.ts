@@ -9,3 +9,6 @@ Deno.test(async function DenoAsyncFunction() {
     assertEquals(1, 1);
 });
 
+Deno.test.ignore(function DenoIgnoredFunction() {
+    assertEquals(1, 1);
+});

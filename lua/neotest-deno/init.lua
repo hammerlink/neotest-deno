@@ -51,7 +51,7 @@ function NeotestAdapter.discover_positions(file_path)
 	-- Lazy load the query file only when needed
 	if not query then
 		local query_path = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h")
-			.. "/../ts-discover-positions.txt"
+			.. "/../ts-discover-positions.scm"
 		local query_file = io.open(query_path, "r")
 		if not query_file then
 			logger.error("Could not open query file: " .. query_path)

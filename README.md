@@ -71,7 +71,6 @@ require("neotest").setup({
 ```
 
 ## TODO
-- [ ] running directories not supported
 - [ ] treesitter supporting nested subtests
 - [ ] support dap
 - [ ] treesitter - support `Deno.test.ignore|only()` tests

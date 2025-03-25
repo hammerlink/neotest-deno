@@ -45,7 +45,7 @@ async function validateTestQuery(testRelativePath: string, testOptions?: { names
 
 Deno.test('Tree-sitter - Function name', async () => {
     await validateTestQuery('./tree-sitter-examples/deno-function.test.ts', {
-        names: ['DenoFunction', 'DenoAsyncFunction', 'DenoIgnoredFunction'],
+        names: ['DenoFunction', 'DenoAsyncFunction', 'DenoIgnoredFunction', 'DenoOnlyFunction'],
     });
 });
 Deno.test('Tree-sitter - Arg Name Function', async () => {

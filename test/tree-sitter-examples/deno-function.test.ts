@@ -12,3 +12,7 @@ Deno.test(async function DenoAsyncFunction() {
 Deno.test.ignore(function DenoIgnoredFunction() {
     assertEquals(1, 1);
 });
+
+Deno.test.only(function DenoOnlyFunction() {
+    assertEquals(1, 1);
+});

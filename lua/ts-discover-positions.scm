@@ -11,7 +11,6 @@
             object: (identifier) @object (#eq? @object "Deno")
             property: (property_identifier) @property (#eq? @property "test")
         )
-        property: (property_identifier) @ignore (#eq? @ignore "ignore")
       )
   ]
   arguments: [
@@ -54,7 +53,5 @@
           ]
         )
       )
-      ; Test Object & name function `{name: 'MyTest', fn: function CustonName() {}}`
-      ; Test Object & arrow `{name: 'MyTest', fn: function CustonName() {}}`
   ]
 ) @test.definition

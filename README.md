@@ -73,7 +73,7 @@ require("neotest").setup({
 ## TODO
 - [ ] treesitter supporting nested subtests
 - [ ] support dap
-- [ ] treesitter - support `Deno.test.ignore|only()` tests
+- [ ] handle only test results (status = filtered out?)
 
 ## License
 
